@@ -7,18 +7,18 @@ public class EnemyPatrol : MonoBehaviour
 
     public float forceStrength;     //speed
     public float stopDistance;      // how close before moving onto the next point
-    public Vector2[] patrolPoints;  // List of patrol points the object will go between
+    public Vector3[] patrolPoints;  // List of patrol points the object will go between
 
 
     private int currentPoint = 0;       // Index of the current point we're moving towards
-    private Rigidbody2D ourRigidbody;   // The rigidbody attached to this object
+    private Rigidbody ourRigidbody;   // The rigidbody attached to this object
     private float distance;
 
 
     void Awake()
     {
         // The rigidbody for movement
-        ourRigidbody = GetComponent<Rigidbody2D>();
+        ourRigidbody = GetComponent<Rigidbody>();
     }
 
 
@@ -30,7 +30,7 @@ public class EnemyPatrol : MonoBehaviour
 
 
         // distance from the target
-        float distance = (patrolPoints[currentPoint] - (Vector2)transform.position).magnitude;
+        float distance = (patrolPoints[currentPoint] - transform.position).magnitude;
 
 
         if (distance <= stopDistance)
@@ -47,7 +47,7 @@ public class EnemyPatrol : MonoBehaviour
         }
 
 
-        Vector2 direction = (patrolPoints[currentPoint] - (Vector2)transform.position).normalized;
+        Vector2 direction = (patrolPoints[currentPoint]-transform.position).normalized;
 
         // Move in the correct direction with the set force strength
         ourRigidbody.AddForce(direction * forceStrength);
