@@ -5,8 +5,8 @@ using UnityEngine.SceneManagement; // Required for reloading the scene
 
 public class PlayerDeath : MonoBehaviour
 {
-    // Animator component (optional, if using death animation)
-    public Animator animator;
+    // Reference to the player's Animator (if using a death animation for the player)
+    public Animator playerAnimator;
 
     // Boolean to use a Game Over screen (optional)
     public bool useGameOverScreen = false;
@@ -14,13 +14,28 @@ public class PlayerDeath : MonoBehaviour
     // Optional Game Over Manager reference (for showing Game Over UI)
     // public GameOverManager gameOverManager;
 
-    // This method is called when a collision occurs
-    private void OnCollisionEnter(Collision collision)
+    // Handle jumpscare: Reference to the monster's Animator
+    public Animator monsterAnimator; // Assign this in the Inspector
+
+    // This method is called when a trigger occurs
+    private void OnTriggerEnter(Collider other)
     {
         // Check if the player object (tagged as "Player") collides with an enemy (tagged as "Enemy")
-        if (gameObject.CompareTag("Player") && collision.gameObject.CompareTag("Enemy"))
+        if (CompareTag("Player") && other.CompareTag("Enemy"))
         {
-            Die(); // Trigger player death logic
+            TriggerJumpscare(other.gameObject);
+            Die();
+            Debug.Log("Player died.");
+        }
+    }
+
+    // Trigger jumpscare animation on the enemy (monster)
+    void TriggerJumpscare(GameObject enemy)
+    {
+        // Check if the monster has an Animator, and trigger the Jumpscare animation
+        if (monsterAnimator != null)
+        {
+            monsterAnimator.SetTrigger("Jumpscare"); // This will play the monster's jumpscare animation
         }
     }
 
@@ -29,10 +44,10 @@ public class PlayerDeath : MonoBehaviour
     {
         Debug.Log("Player died!");
 
-        // Option 1: Play death animation (if using an Animator)
-        if (animator != null)
+        // Option 1: Play death animation for the player (if using an Animator)
+        if (playerAnimator != null)
         {
-            animator.SetTrigger("Death");
+            playerAnimator.SetTrigger("Death");
         }
 
         // Option 2: Show Game Over screen (optional, if using a Game Over Manager)
@@ -46,7 +61,7 @@ public class PlayerDeath : MonoBehaviour
         else
         {
             // Option 3: Reload the scene (restart the level)
-            //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
 
         // Option 4: Destroy the player GameObject (optional)
