@@ -47,7 +47,7 @@ public class EnemyPatrol : MonoBehaviour
         }
 
 
-        Vector2 direction = (patrolPoints[currentPoint]-transform.position).normalized;
+        Vector3 direction = (patrolPoints[currentPoint]-transform.position).normalized;
 
         // Move in the correct direction with the set force strength
         ourRigidbody.AddForce(direction * forceStrength);
