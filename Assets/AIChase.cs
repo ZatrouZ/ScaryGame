@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement; // Required for reloading the scene
 
 public class AIChase : MonoBehaviour
 {
@@ -11,6 +12,10 @@ public class AIChase : MonoBehaviour
 
     private EnemyPatrol patrol;
     private float distance;
+
+    // Reference to the player's Animator (if using a death animation for the player)
+    public Animator playerAnimator; // Assign this in the Inspector
+    public Animator monsterAnimator; // Assign this for the enemy's jumpscare animation
 
     void Start()
     {
@@ -30,6 +35,11 @@ public class AIChase : MonoBehaviour
         {
             patrol.enabled = false; // Disable patrol script when chasing
             ChasePlayer(); // Call the chase function
+
+            if (distance < 1.0f) // If the enemy is very close to the player, trigger death
+            {
+                Die();
+            }
         }
         else if (distance >= stopChaseDistance) // If the player is far enough, stop chasing
         {
@@ -50,6 +60,32 @@ public class AIChase : MonoBehaviour
         // Move the enemy towards the player
         transform.position = Vector3.MoveTowards(transform.position, player.transform.position, speed * Time.deltaTime);
     }
+
+    void Die()
+    {
+        Debug.Log("Player died!");
+
+        // Play death animation for the player (if using an Animator)
+        if (playerAnimator != null)
+        {
+            playerAnimator.SetTrigger("Death");
+        }
+
+        // Trigger jumpscare animation on the monster
+        if (monsterAnimator != null)
+        {
+            monsterAnimator.SetTrigger("Jumpscare");
+        }
+
+        // Optionally reload the scene after a short delay
+        Invoke("RestartLevel", 3f);
+    }
+
+    void RestartLevel()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
     //if (hiding == true) //If distance is 8 or closer. This object where this script is placed will start following the player. However if further away than distance 9 it will stop following you.
     //{
     // patrol.enabled = false; //EnemyPatrol Disables

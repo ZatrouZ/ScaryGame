@@ -332,42 +332,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 11.446, y: -160.858, z: -152.201}
---- !u!1 &397414964 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 149588198081275160, guid: 6e94609595f292f4a9080d76c0f938cf, type: 3}
-  m_PrefabInstance: {fileID: 149588198205101136}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &397414965
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 397414964}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9e88468b58f043f49a52827b7443b642, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerAnimator: {fileID: 0}
-  useGameOverScreen: 0
-  monsterAnimator: {fileID: 0}
---- !u!54 &397414966
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 397414964}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!1 &399359172
 GameObject:
   m_ObjectHideFlags: 0
@@ -385,7 +349,7 @@ GameObject:
   - component: {fileID: 399359178}
   m_Layer: 0
   m_Name: EnemyObject
-  m_TagString: Enemy
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -518,6 +482,8 @@ MonoBehaviour:
   speed: 10
   chaseDistance: 15
   stopChaseDistance: 18
+  playerAnimator: {fileID: 0}
+  monsterAnimator: {fileID: 0}
 --- !u!1 &616987971
 GameObject:
   m_ObjectHideFlags: 0
@@ -671,7 +637,7 @@ GameObject:
   - component: {fileID: 859459401}
   m_Layer: 0
   m_Name: Enemy
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
