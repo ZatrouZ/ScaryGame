@@ -1,59 +1,81 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class AIChase : MonoBehaviour
 {
     public GameObject player;
-    public float speed = 3.0f;            // Enemy movement speed
-    public float chaseDistance = 5.0f;    // Distance at which enemy starts chasing
-    public float stopChaseDistance = 9.0f;// Distance at which enemy stops chasing
+    public float chaseSpeed = 6.0f;               // Chasing speed
+    public float chaseDistance = 5.0f;            // Distance to start chasing
+    public float stopChaseDistance = 9.0f;        // Distance to stop chasing
 
-    private EnemyPatrol patrol;
-    private float distance;
+    private EnemyPatrol patrol;                   // Reference to patrol script
+    private float distance;                       // Distance to player
 
-    private Animator enemyAnimator;        // Reference to the Animator component
+    public Animator enemyAnimator;                // Reference to Animator
+
+    private Vector3 initialPosition;              // To store initial Y position of the enemy
 
     void Start()
     {
-        patrol = GetComponent<EnemyPatrol>();
+        patrol = GetComponent<EnemyPatrol>();     // Reference the patrol script
+        initialPosition = transform.position;     // Store the initial position of the enemy
     }
 
     void Update()
     {
         if (player == null)
         {
-            player = GameObject.FindWithTag("Player"); // Find player if not assigned
+            player = GameObject.FindWithTag("Player"); // Find the player if not already assigned
         }
 
+        // Calculate distance between enemy and player
         distance = Vector3.Distance(transform.position, player.transform.position);
 
-        if (distance <= chaseDistance)
+        if (distance <= chaseDistance) // If close enough, start chasing
         {
-            patrol.enabled = false; // Disable patrol when chasing
-            ChasePlayer();
+            patrol.enabled = false;              // Disable patrol while chasing
+            ChasePlayer();                       // Start chasing
 
-            enemyAnimator.SetBool("isRunning", true);   // Set isRunning to true
-            enemyAnimator.SetBool("isMoving", false);   // Disable walking animation
+            // Set animation parameters
+            enemyAnimator.SetBool("isRunning", true);
+            enemyAnimator.SetBool("isMoving", false);  // Ensure walking is false when chasing
         }
-        else if (distance >= stopChaseDistance)
+        else if (distance >= stopChaseDistance) // If far enough, stop chasing
         {
-            patrol.enabled = true; // Re-enable patrol script
-            enemyAnimator.SetBool("isRunning", false);  // Set isRunning to false (stop running)
+            patrol.enabled = true;               // Enable patrol
+            enemyAnimator.SetBool("isRunning", false); // Stop running
+        }
+        else if (patrol != null && patrol.isPatrolling) // If patrolling
+        {
+            enemyAnimator.SetBool("isMoving", true);   // Walk
+            enemyAnimator.SetBool("isRunning", false); // Ensure running is false
+        }
+        else // Idle if not walking or running
+        {
+            enemyAnimator.SetBool("isMoving", false);
+            enemyAnimator.SetBool("isRunning", false);
         }
     }
 
     void ChasePlayer()
     {
+        // Calculate direction to the player
         Vector3 direction = player.transform.position - transform.position;
+
+        // Keep the enemy at the same Y position to prevent floating or jumping
         direction.y = 0;
 
-        // Smooth rotation towards player
+        // Rotate to face the player
         Quaternion targetRotation = Quaternion.LookRotation(direction);
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 5.0f);
 
-        // Move towards player
-        transform.position = Vector3.MoveTowards(transform.position, player.transform.position, speed * Time.deltaTime);
+        // Move towards the player without affecting the Y position
+        Vector3 newPosition = Vector3.MoveTowards(transform.position, player.transform.position, chaseSpeed * Time.deltaTime);
+
+        // Ensure the Y position stays constant (keep enemy grounded)
+        newPosition.y = initialPosition.y;
+
+        transform.position = newPosition;
     }
 }

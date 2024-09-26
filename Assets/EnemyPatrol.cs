@@ -4,15 +4,14 @@ using UnityEngine;
 
 public class EnemyPatrol : MonoBehaviour
 {
-    public float forceStrength = 10f;      // Speed or movement force
-    public float stopDistance = 1f;        // How close the enemy needs to be to the patrol point before moving to the next one
-    public Vector3[] patrolPoints;         // List of patrol points the enemy will patrol between
-    public float maxSpeed = 5f;            // Maximum speed of the enemy
+    public float patrolSpeed = 3f;               // Patrol movement speed
+    public float stopDistance = 1f;              // Distance to stop at patrol points
+    public Vector3[] patrolPoints;               // Patrol points
+    public float maxSpeed = 5f;                  // Maximum movement speed
 
-    private int currentPoint = 0;          // Index of the current patrol point
-    private Rigidbody ourRigidbody;        // The Rigidbody attached to the enemy
-
-    private Animator enemyAnimator;         // Reference to the Animator component
+    private int currentPoint = 0;                // Current patrol point index
+    private Rigidbody ourRigidbody;              // Rigidbody for movement
+    public bool isPatrolling = false;            // Flag to indicate patrolling
 
     void Awake()
     {
@@ -23,43 +22,50 @@ public class EnemyPatrol : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (patrolPoints.Length == 0) return;
+        if (patrolPoints.Length == 0) return;    // No patrol points set
 
         float distance = Vector3.Distance(transform.position, patrolPoints[currentPoint]);
 
-        if (distance <= stopDistance)
+        if (distance <= stopDistance) // If close enough to patrol point, move to next
         {
             currentPoint++;
-            if (currentPoint >= patrolPoints.Length) currentPoint = 0;
+            if (currentPoint >= patrolPoints.Length)
+            {
+                currentPoint = 0; // Loop back to the first patrol point
+            }
         }
 
         Vector3 direction = (patrolPoints[currentPoint] - transform.position).normalized;
 
-        if (direction.magnitude > 0.1f) // If the enemy is moving
+        if (direction.magnitude > 0.1f) // If moving towards patrol point
         {
-            enemyAnimator.SetBool("isMoving", true); // Set isMoving to true
+            // Set the patrolling flag to true
+            isPatrolling = true;
+
+            // Move towards the patrol point
+            ourRigidbody.AddForce(direction * patrolSpeed);
+
+            // Clamp velocity to prevent overshooting
+            if (ourRigidbody.velocity.magnitude > maxSpeed)
+            {
+                ourRigidbody.velocity = ourRigidbody.velocity.normalized * maxSpeed;
+            }
+
+            // Smooth rotation towards the patrol direction
+            if (direction != Vector3.zero)
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(direction);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 5f);
+            }
         }
         else
         {
-            enemyAnimator.SetBool("isMoving", false); // Set isMoving to false (idle)
-        }
-
-        // Apply force and clamp speed
-        ourRigidbody.AddForce(direction * forceStrength);
-        if (ourRigidbody.velocity.magnitude > maxSpeed)
-        {
-            ourRigidbody.velocity = ourRigidbody.velocity.normalized * maxSpeed;
-        }
-
-        // Smooth rotation towards patrol direction
-        if (direction != Vector3.zero)
-        {
-            
-            Quaternion targetRotation = Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 5f);
+            // If not moving, set isPatrolling to false
+            isPatrolling = false;
         }
     }
 
+    // Visualize patrol points in the Editor
     void OnDrawGizmos()
     {
         if (patrolPoints.Length > 0)
