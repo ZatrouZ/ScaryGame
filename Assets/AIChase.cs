@@ -46,7 +46,7 @@ public class AIChase : MonoBehaviour
             patrol.enabled = true;               // Enable patrol
             enemyAnimator.SetBool("isRunning", false); // Stop running
         }
-        else if (patrol != null && patrol.isPatrolling) // If patrolling
+        else if (patrol != null && patrol)//.isPatrolling//) // If patrolling
         {
             enemyAnimator.SetBool("isMoving", true);   // Walk
             enemyAnimator.SetBool("isRunning", false); // Ensure running is false
