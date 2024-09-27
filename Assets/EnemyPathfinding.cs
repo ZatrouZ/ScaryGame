@@ -1,95 +1,121 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AI;  // Required for NavMesh
+using UnityEngine.AI;
 
 public class EnemyPathfinding : MonoBehaviour
 {
-    public Transform player;                // Reference to the player
-    public float chaseDistance = 10f;       // Distance at which the enemy starts chasing
-    public float stopChaseDistance = 15f;   // Distance at which the enemy stops chasing
-    public float patrolSpeed = 3.0f;        // Speed during patrol
-    public float chaseSpeed = 6.0f;         // Speed while chasing
+    public Transform player;            // The player's transform
+    public float chaseDistance = 10f;   // Distance within which the enemy starts chasing
+    public float stoppingDistance = 2f; // Distance where the enemy stops moving toward the player
+    public float patrolSpeed = 2f;      // Speed of the enemy while patrolling
+    public float chaseSpeed = 3.5f;     // Speed of the enemy when chasing
+    public Transform[] patrolPoints;    // Patrol points for the enemy to move between
+    public LayerMask obstacleLayer;     // Layer mask to check for obstacles like walls
 
-    private NavMeshAgent navMeshAgent;      // NavMeshAgent for pathfinding
-    private EnemyPatrol patrol;             // Reference to the patrol script (if applicable)
-    private Animator enemyAnimator;         // Reference to the Animator
-
-    private bool isChasing = false;         // To track if the enemy is chasing the player
-    private float distanceToPlayer;         // Distance to the player
+    private int currentPatrolIndex = 0; // Patrol point index
+    private NavMeshAgent agent;         // NavMeshAgent for pathfinding
+    private Animator anim;              // Animator for controlling animations
+    private bool isChasing = false;     // Whether the enemy is currently chasing the player
+    private bool isPatrolling = true;   // Whether the enemy is currently patrolling
+    private bool isObstacleBlocking = false;  // Whether an obstacle is blocking the path
 
     void Start()
     {
-        // Get the NavMeshAgent component attached to this enemy
-        navMeshAgent = GetComponent<NavMeshAgent>();
+        // Initialize components
+        agent = GetComponent<NavMeshAgent>();
+        anim = GetComponent<Animator>();
 
-        // Get the patrol script and Animator if applicable
-        patrol = GetComponent<EnemyPatrol>();
-        enemyAnimator = GetComponent<Animator>();
-
-        // Set the initial speed for the agent
-        navMeshAgent.speed = patrolSpeed;
+        agent.speed = patrolSpeed;      // Set patrol speed initially
+        PatrolNextPoint();              // Start patrolling
     }
 
     void Update()
     {
-        if (player == null)
+        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+
+        // If the player is within chase distance and there are no obstacles in the way, start chasing
+        if (distanceToPlayer <= chaseDistance && !ObstacleInWay())
         {
-            // Find the player object by tag if not already assigned
-            player = GameObject.FindWithTag("Player").transform;
+            isChasing = true;
+            isPatrolling = false;
+            agent.speed = chaseSpeed;   // Set chase speed
+
+            // Set destination to the player's position
+            agent.SetDestination(player.position);
+        }
+        // If the player is too far away, stop chasing and resume patrol
+        else if (distanceToPlayer > chaseDistance || ObstacleInWay())
+        {
+            isChasing = false;
+            isPatrolling = true;
+            agent.speed = patrolSpeed;  // Reset to patrol speed
+
+            PatrolNextPoint();
         }
 
-        // Calculate the distance to the player
-        distanceToPlayer = Vector3.Distance(transform.position, player.position);
+        // Handle animations based on state
+        HandleAnimations();
 
-        if (distanceToPlayer <= chaseDistance)
+        // Stop chasing if the player is close enough
+        if (isChasing && distanceToPlayer <= stoppingDistance)
         {
-            StartChasing();
+            agent.isStopped = true; // Stop the NavMeshAgent from moving further
         }
-        else if (distanceToPlayer >= stopChaseDistance)
+        else
         {
-            StopChasing();
-        }
-
-        // Update animations based on movement
-        UpdateAnimations();
-    }
-
-    void StartChasing()
-    {
-        isChasing = true;
-        navMeshAgent.speed = chaseSpeed;  // Increase speed while chasing
-        navMeshAgent.SetDestination(player.position);  // Pathfinding to player's position
-
-        // Stop patrol if active
-        if (patrol != null)
-        {
-            patrol.enabled = false;
-        }
-    }
-
-    void StopChasing()
-    {
-        isChasing = false;
-        navMeshAgent.speed = patrolSpeed;  // Reset speed to patrol speed
-
-        // If a patrol script exists, re-enable it when the enemy stops chasing
-        if (patrol != null)
-        {
-            patrol.enabled = true;
+            agent.isStopped = false; // Allow movement
         }
     }
 
-    void UpdateAnimations()
+    void HandleAnimations()
     {
-        // Set the "isMoving" boolean based on whether the agent is moving
-        bool isMoving = navMeshAgent.velocity.magnitude > 0.1f;
-
-        // Set the "isRunning" boolean based on whether the enemy is chasing
-        if (enemyAnimator != null)
+        // Set the animations based on the state of the enemy
+        if (isChasing)
         {
-            enemyAnimator.SetBool("isMoving", !isChasing && isMoving);   // Walking animation if patrolling
-            enemyAnimator.SetBool("isRunning", isChasing && isMoving);   // Running animation if chasing
+            anim.SetBool("isRunning", true);
+            anim.SetBool("isMoving", false);
         }
+        else if (isPatrolling)
+        {
+            anim.SetBool("isMoving", true);
+            anim.SetBool("isRunning", false);
+        }
+    }
+
+    void PatrolNextPoint()
+    {
+        if (patrolPoints.Length == 0) return;
+
+        // Set the NavMeshAgent's next destination to the next patrol point
+        agent.SetDestination(patrolPoints[currentPatrolIndex].position);
+
+        // Loop through patrol points
+        currentPatrolIndex = (currentPatrolIndex + 1) % patrolPoints.Length;
+    }
+
+    bool ObstacleInWay()
+    {
+        // Check if there's an obstacle between the enemy and the player
+        RaycastHit hit;
+        Vector3 direction = (player.position - transform.position).normalized;
+
+        if (Physics.Raycast(transform.position, direction, out hit, chaseDistance, obstacleLayer))
+        {
+            // If the ray hits something that isn't the player, return true (obstacle detected)
+            if (hit.transform != player)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        // Visualize the chase distance in the Editor
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, chaseDistance);
     }
 }
