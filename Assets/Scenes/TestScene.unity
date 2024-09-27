@@ -1242,7 +1242,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 149588198205101138}
-  chaseDistance: 20
+  chaseDistance: 30
   stoppingDistance: 10
   patrolSpeed: 6
   chaseSpeed: 7
