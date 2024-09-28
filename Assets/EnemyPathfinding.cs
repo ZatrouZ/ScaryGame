@@ -105,12 +105,15 @@ public class EnemyPathfinding : MonoBehaviour
             // If the ray hits something that isn't the player, return true (obstacle detected)
             if (hit.transform != player)
             {
+                isObstacleBlocking = true;  // Update this field based on raycast result
                 return true;
             }
         }
 
+        isObstacleBlocking = false;  // No obstacle detected
         return false;
     }
+
 
     private void OnDrawGizmosSelected()
     {
