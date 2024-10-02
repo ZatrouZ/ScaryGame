@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: CRTCustomConfig
   m_EditorClassIdentifier: 
   data:
-    pixelationAmount: 2
+    pixelationAmount: 3
     maxColorChannels:
       red: 0
       green: 0
@@ -42,4 +42,4 @@ MonoBehaviour:
       sizeMultiplier: 6.2
     innerMonitorShineRadius: -0.087
     innerMonitorShineCurve: 10
-  validationId: 5846a710-30b5-4de8-a0bc-7f0599092ed0
+  validationId: a8808740-ed17-4589-b3f6-29cdaf5e7d99
