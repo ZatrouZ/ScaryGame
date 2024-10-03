@@ -1799,14 +1799,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 816608536}
-  chaseDistance: 20
-  stoppingDistance: 1
+  chaseDistance: 30
+  stoppingDistance: 0
   patrolSpeed: 6
   chaseSpeed: 9
   patrolPoints: []
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 2048
+  rotationSpeed: 5
 --- !u!4 &816608536 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3196960945580058628, guid: 6e94609595f292f4a9080d76c0f938cf, type: 3}

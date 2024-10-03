@@ -20,6 +20,8 @@ public class EnemyPathfinding : MonoBehaviour
     private bool isPatrolling = true;   // Whether the enemy is currently patrolling
     private bool isObstacleBlocking = false;  // Whether an obstacle is blocking the path
 
+    public float rotationSpeed = 5f;    // Speed at which the enemy rotates towards the player
+
     void Start()
     {
         // Initialize components
@@ -43,6 +45,9 @@ public class EnemyPathfinding : MonoBehaviour
 
             // Set destination to the player's position
             agent.SetDestination(player.position);
+
+            // Rotate the enemy to face the player
+            RotateTowards(player.position);
         }
         // If the player is too far away, stop chasing and resume patrol
         else if (distanceToPlayer > chaseDistance || ObstacleInWay())
@@ -114,6 +119,20 @@ public class EnemyPathfinding : MonoBehaviour
         return false;
     }
 
+    void RotateTowards(Vector3 target)
+    {
+        // Calculate the direction to the target (player)
+        Vector3 direction = (target - transform.position).normalized;
+
+        // Ignore the Y-axis (height) to ensure only horizontal rotation
+        direction.y = 0;
+
+        // Calculate the target rotation based on the direction
+        Quaternion targetRotation = Quaternion.LookRotation(direction);
+
+        // Smoothly rotate towards the player
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSpeed);
+    }
 
     private void OnDrawGizmosSelected()
     {
