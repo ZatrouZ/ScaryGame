@@ -16,6 +16,7 @@ public class EnemyPathfinding : MonoBehaviour
     private int currentPatrolIndex = 0; // Patrol point index
     private NavMeshAgent agent;         // NavMeshAgent for pathfinding
     private Animator anim;              // Animator for controlling animations
+    private EnemyPatrol enemyPatrol;    // Reference to the EnemyPatrol script
     private bool isChasing = false;     // Whether the enemy is currently chasing the player
     private bool isPatrolling = true;   // Whether the enemy is currently patrolling
     private bool isObstacleBlocking = false;  // Whether an obstacle is blocking the path
@@ -27,6 +28,7 @@ public class EnemyPathfinding : MonoBehaviour
         // Initialize components
         agent = GetComponent<NavMeshAgent>();
         anim = GetComponent<Animator>();
+        enemyPatrol = GetComponent<EnemyPatrol>();  // Get reference to EnemyPatrol script
 
         agent.speed = patrolSpeed;      // Set patrol speed initially
         PatrolNextPoint();              // Start patrolling
@@ -43,6 +45,12 @@ public class EnemyPathfinding : MonoBehaviour
             isPatrolling = false;
             agent.speed = chaseSpeed;   // Set chase speed
 
+            // Disable the EnemyPatrol script when chasing the player
+            if (enemyPatrol != null && enemyPatrol.enabled)
+            {
+                enemyPatrol.enabled = false;
+            }
+
             // Set destination to the player's position
             agent.SetDestination(player.position);
 
@@ -55,6 +63,12 @@ public class EnemyPathfinding : MonoBehaviour
             isChasing = false;
             isPatrolling = true;
             agent.speed = patrolSpeed;  // Reset to patrol speed
+
+            // Enable the EnemyPatrol script when returning to patrol
+            if (enemyPatrol != null && !enemyPatrol.enabled)
+            {
+                enemyPatrol.enabled = true;
+            }
 
             PatrolNextPoint();
         }
