@@ -252,7 +252,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: b694b8ec5c41f6247843a2b67222fda6, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.43400192
+      value: 0.385
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: b694b8ec5c41f6247843a2b67222fda6, type: 3}
       propertyPath: m_LocalPosition.y
@@ -260,7 +260,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: b694b8ec5c41f6247843a2b67222fda6, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.79100037
+      value: 0.737
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: b694b8ec5c41f6247843a2b67222fda6, type: 3}
       propertyPath: m_LocalRotation.w
@@ -3876,6 +3876,26 @@ MonoBehaviour:
   tiltAmount: 2
   walkSpeedThreshold: 1.5
   runSpeedThreshold: 5
+--- !u!114 &1668715033
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1668715027}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4bfaea3b64647c94b93d8470e6787367, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerCamera: {fileID: 1670416313}
+  positionOffset: {x: 0.2, y: -0.2, z: 0.5}
+  rotationOffset: {x: 0, y: 0, z: 0}
+--- !u!4 &1670416313 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3196960946714422096, guid: 6e94609595f292f4a9080d76c0f938cf, type: 3}
+  m_PrefabInstance: {fileID: 3196960944784989468}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1681801539
 GameObject:
   m_ObjectHideFlags: 0
