@@ -65,16 +65,21 @@ public class FlashlightBob : MonoBehaviour
 
         // Increase the bob timer using the selected speed
         bobTimer += Time.deltaTime * bobSpeed;
+    }
 
-        // Calculate the new position offset using a sine wave for smooth bobbing
+    // Get the current position bobbing offset based on the bobTimer
+    public Vector3 GetBobbingOffset()
+    {
         float bobOffsetY = Mathf.Sin(bobTimer) * bobAmount;
         float bobOffsetX = Mathf.Sin(bobTimer * 2) * bobAmount * 0.5f;  // Adds a bit of side-to-side bobbing
+        return new Vector3(bobOffsetX, bobOffsetY, 0);
+    }
 
-        // Calculate the new rotation offset using a cosine wave for a smooth tilt effect
+    // Get the current rotation bobbing offset based on the bobTimer
+    public Quaternion GetBobbingRotation()
+    {
         float tiltRotationZ = Mathf.Cos(bobTimer) * rotationBobAmount;
-
-        // Apply the calculated position and rotation to the flashlight
-        transform.localPosition = new Vector3(initialPosition.x + bobOffsetX, initialPosition.y + bobOffsetY, initialPosition.z);
-        transform.localRotation = initialRotation * Quaternion.Euler(0, 0, tiltRotationZ);
+        return Quaternion.Euler(0, 0, tiltRotationZ);
     }
 }
+

@@ -3695,10 +3695,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba112ba1cbeaaea408dceb5f75e10586, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  idleBobSpeed: 0.5
-  walkBobSpeed: 1.5
-  runBobSpeed: 2.5
-  bobAmount: 0.02
+  idleBobSpeed: 0.2
+  walkBobSpeed: 1
+  runBobSpeed: 2
+  bobAmount: 0.05
   rotationBobAmount: 1.5
   walkSpeedThreshold: 1.5
   runSpeedThreshold: 5
