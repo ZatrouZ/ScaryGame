@@ -1,38 +1,65 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class JumpscareImageScript : MonoBehaviour
 {
-    public GameObject JumpScareImg;     // Corrected the colon to semicolon
-    public AudioSource audioSource;     // AudioSource reference for jumpscare sound
+    public GameObject jumpScareImg; // Use camel case for variable names
+    public AudioSource audioSource; // AudioSource reference for jumpscare sound
 
     // Start is called before the first frame update
     void Start()
     {
         // Ensure the jumpscare image is hidden at the start
-        JumpScareImg.SetActive(false);
+        if (jumpScareImg != null)
+        {
+            jumpScareImg.SetActive(false);
+        }
+        else
+        {
+            Debug.LogWarning("JumpScareImg GameObject is not assigned in the inspector.");
+        }
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("Player")) // Check if the player triggered it
+        // Check if the player triggered it
+        if (other.CompareTag("Player"))
         {
             // Show the jumpscare image
-            JumpScareImg.SetActive(true);
-
-            // Play the jumpscare sound
-            audioSource.Play();
-
-            // Start the coroutine to hide the image after 2 seconds
-            StartCoroutine(DisableImg());
+            ShowJumpscare();
         }
     }
 
+    // Method to show the jumpscare image and play sound
+    private void ShowJumpscare()
+    {
+        // Show the jumpscare image
+        if (jumpScareImg != null)
+        {
+            jumpScareImg.SetActive(true);
+        }
+
+        // Play the jumpscare sound
+        if (audioSource != null)
+        {
+            audioSource.Play();
+        }
+        else
+        {
+            Debug.LogWarning("AudioSource is not assigned in the inspector.");
+        }
+
+        // Start the coroutine to hide the image after a delay
+        StartCoroutine(DisableImg());
+    }
+
     // Coroutine to disable the jumpscare image after 2 seconds
-    IEnumerator DisableImg()
+    private IEnumerator DisableImg()
     {
         yield return new WaitForSeconds(2);
-        JumpScareImg.SetActive(false);
+        if (jumpScareImg != null)
+        {
+            jumpScareImg.SetActive(false);
+        }
     }
 }
