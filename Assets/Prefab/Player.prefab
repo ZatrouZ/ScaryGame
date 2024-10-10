@@ -763,3 +763,22 @@ MonoBehaviour:
   playerCamera: {fileID: 3196960946714422096}
   positionOffset: {x: 0.4, y: -0.25, z: 0.5}
   rotationOffset: {x: 80, y: -2, z: -4}
+--- !u!114 &1668715032
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3196960945112155388}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba112ba1cbeaaea408dceb5f75e10586, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  idleBobSpeed: 0.2
+  walkBobSpeed: 1
+  runBobSpeed: 2
+  bobAmount: 0.05
+  rotationBobAmount: 1.5
+  walkSpeedThreshold: 1.5
+  runSpeedThreshold: 5
