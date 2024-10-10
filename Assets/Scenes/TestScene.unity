@@ -4556,6 +4556,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1668715032, guid: 6e94609595f292f4a9080d76c0f938cf, type: 3}
+      propertyPath: bobAmount
+      value: 0.01
+      objectReference: {fileID: 0}
     - target: {fileID: 3196960945580058628, guid: 6e94609595f292f4a9080d76c0f938cf, type: 3}
       propertyPath: m_RootOrder
       value: 3
@@ -4603,6 +4607,22 @@ PrefabInstance:
     - target: {fileID: 3196960946188500796, guid: 6e94609595f292f4a9080d76c0f938cf, type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 3196960946714422097, guid: 6e94609595f292f4a9080d76c0f938cf, type: 3}
+      propertyPath: runBobSpeed
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 3196960946714422097, guid: 6e94609595f292f4a9080d76c0f938cf, type: 3}
+      propertyPath: idleBobSpeed
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3196960946714422097, guid: 6e94609595f292f4a9080d76c0f938cf, type: 3}
+      propertyPath: walkBobSpeed
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3196960946714422097, guid: 6e94609595f292f4a9080d76c0f938cf, type: 3}
+      propertyPath: walkBobAmount
+      value: 0.06
       objectReference: {fileID: 0}
     - target: {fileID: 3196960946714422098, guid: 6e94609595f292f4a9080d76c0f938cf, type: 3}
       propertyPath: _runtimeMaterial
