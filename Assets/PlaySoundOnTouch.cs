@@ -16,6 +16,7 @@ public class PlaySoundOnTouch : MonoBehaviour
     public float cameraFocusSpeed = 2f;     // Speed of camera movement when focusing on the object
     private bool focusOnObject = false;     // Flag to trigger camera focus
     private Transform targetObject;         // The object that the camera should look at
+    public float focusDuration = 5f;        // Duration for which the camera will focus on the object (5 seconds)
 
     void Start()
     {
@@ -32,8 +33,6 @@ public class PlaySoundOnTouch : MonoBehaviour
             Vector3 directionToTarget = (targetObject.position - playerCamera.transform.position).normalized;
             Quaternion lookRotation = Quaternion.LookRotation(directionToTarget);
             playerCamera.transform.rotation = Quaternion.Slerp(playerCamera.transform.rotation, lookRotation, Time.deltaTime * cameraFocusSpeed);
-
-            // Optional: You can add additional conditions to stop focusing once camera is sufficiently aligned
         }
     }
 
@@ -49,6 +48,7 @@ public class PlaySoundOnTouch : MonoBehaviour
             if (objectsToToggle.Count > 0 && objectsToToggle[0].activeSelf)
             {
                 StartCameraFocus(objectsToToggle[0].transform); // Start focusing on the first object
+                StartCoroutine(StopCameraFocusAfterDelay(focusDuration)); // Stop focusing after 5 seconds
             }
         }
     }
@@ -90,11 +90,17 @@ public class PlaySoundOnTouch : MonoBehaviour
         focusOnObject = true;  // Enable camera focus
     }
 
-    // Optional: Call this to stop focusing on the object (if needed)
+    // Stop camera focus after a delay (5 seconds)
+    IEnumerator StopCameraFocusAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay); // Wait for the specified delay
+        StopCameraFocus(); // Stop focusing the camera
+    }
+
+    // Stop focusing the camera on the object
     void StopCameraFocus()
     {
         focusOnObject = false;  // Disable camera focus
         targetObject = null;    // Clear the target
     }
 }
-

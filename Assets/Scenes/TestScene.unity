@@ -1020,6 +1020,9 @@ MonoBehaviour:
   soundClip: {fileID: 8300000, guid: c72fe94aca2dadc4094a532064ff6a4c, type: 3}
   objectsToToggle:
   - {fileID: 1080562508}
+  playerCamera: {fileID: 1293219672}
+  cameraFocusSpeed: 10
+  focusDuration: 5
 --- !u!65 &499645240
 BoxCollider:
   m_ObjectHideFlags: 0
