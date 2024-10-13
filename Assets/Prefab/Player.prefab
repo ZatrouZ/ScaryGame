@@ -169,7 +169,7 @@ GameObject:
   - component: {fileID: 3196960945024959503}
   m_Layer: 0
   m_Name: PlayerObject
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -322,6 +322,7 @@ GameObject:
   - component: {fileID: 3196960945580058628}
   - component: {fileID: 3196960946188500798}
   - component: {fileID: 3196960946188500797}
+  - component: {fileID: 324234805}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -393,6 +394,22 @@ MonoBehaviour:
   maxSlopeAngle: 0
   orientation: {fileID: 3196960945952879071}
   state: 0
+--- !u!114 &324234805
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3196960946188500796}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bde2aa7e1383284bb9ac12a95a8c5c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  openAngle: 90
+  closeAngle: 0
+  doorSpeed: 2
+  interactionDistance: 3
 --- !u!1 &3196960946614219903
 GameObject:
   m_ObjectHideFlags: 0
@@ -444,7 +461,7 @@ GameObject:
   - component: {fileID: 403950442}
   m_Layer: 0
   m_Name: PlayerCamera
-  m_TagString: Untagged
+  m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -586,10 +603,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5cc77e0bd05a1e4d89e430a85bae9e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  walkBobSpeed: 5
-  runBobSpeed: 9
+  walkBobSpeed: 4
+  runBobSpeed: 6
   idleBobSpeed: 2
-  walkBobAmount: 0.09
+  walkBobAmount: 0.06
   runBobAmount: 0.2
   idleBobAmount: 0.03
   tiltAmount: 0.5
@@ -748,6 +765,25 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: b694b8ec5c41f6247843a2b67222fda6, type: 3}
   m_PrefabInstance: {fileID: 3196960945112121948}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1668715032
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3196960945112155388}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba112ba1cbeaaea408dceb5f75e10586, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  walkBobSpeed: 1
+  runBobSpeed: 2
+  idleBobSpeed: 0.2
+  walkBobAmount: 0.02
+  runBobAmount: 0.05
+  idleBobAmount: 0.01
+  flashlightTiltAmount: 1.5
 --- !u!114 &1668715033
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -763,22 +799,5 @@ MonoBehaviour:
   playerCamera: {fileID: 3196960946714422096}
   positionOffset: {x: 0.4, y: -0.25, z: 0.5}
   rotationOffset: {x: 80, y: -2, z: -4}
---- !u!114 &1668715032
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3196960945112155388}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ba112ba1cbeaaea408dceb5f75e10586, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  idleBobSpeed: 0.2
-  walkBobSpeed: 1
-  runBobSpeed: 2
-  bobAmount: 0.05
-  rotationBobAmount: 1.5
-  walkSpeedThreshold: 1.5
-  runSpeedThreshold: 5
+  positionSmoothSpeed: 8
+  rotationSmoothSpeed: 8

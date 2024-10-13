@@ -195,4 +195,4 @@ public class PlaySoundAndToggleObjectActiveOnTouchWithShake : MonoBehaviour
         playerCamera.localPosition = originalPosition; // Restore original position after shaking
     }
 }
-
+    
