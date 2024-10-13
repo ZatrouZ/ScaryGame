@@ -103,8 +103,8 @@ public class DoorInteraction : MonoBehaviour
         // Perform the raycast
         if (Physics.Raycast(ray, out hit, interactionDistance))
         {
-            // Check if the raycast hit a GameObject with the "Door" tag
-            if (hit.transform.CompareTag("Door"))
+            // Check if the raycast hit the same GameObject as this script's GameObject
+            if (hit.transform == transform) // Check if the hit object is this door
             {
                 return true; // The player is looking at the door
             }
@@ -112,3 +112,4 @@ public class DoorInteraction : MonoBehaviour
         return false; // The player is not looking at the door
     }
 }
+
