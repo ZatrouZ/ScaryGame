@@ -76,18 +76,23 @@ public class PauseMenu : MonoBehaviour
     }
 
     // Set the active state of all AudioSources
+    // Set the active state of all AudioSources
     private void SetAudioSourcesState(bool isPlaying)
     {
         foreach (AudioSource audioSource in audioSources)
         {
-            if (isPlaying)
+            if (audioSource != null) // Ensure the audioSource is still valid
             {
-                audioSource.UnPause(); // Resume audio playback
-            }
-            else
-            {
-                audioSource.Pause(); // Pause audio playback
+                if (isPlaying)
+                {
+                    audioSource.UnPause(); // Resume audio playback
+                }
+                else
+                {
+                    audioSource.Pause(); // Pause audio playback
+                }
             }
         }
     }
+
 }
