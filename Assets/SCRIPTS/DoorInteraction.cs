@@ -85,7 +85,7 @@ public class DoorInteraction : MonoBehaviour
             {
                 Debug.Log("The door is locked. You need the correct key.");
                 StartCoroutine(ShakeDoor()); // Shake the door to indicate it's locked
-                ShowAndFadeInteractionText("The door is locked... I better find a key or another way in."); // Show locked message
+                ShowAndFadeInteractionText(doorInteractionText.text); // Show locked message
             }
         }
         else
