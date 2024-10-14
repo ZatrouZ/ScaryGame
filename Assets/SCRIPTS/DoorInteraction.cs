@@ -28,6 +28,9 @@ public class DoorInteraction : MonoBehaviour
     public float fadeDuration = 2f;         // Time taken for text to fade out
     public float displayDuration = 2f;      // Time before the text starts fading out
 
+    private bool canShowText = true;        // To control when the text can be shown
+    private float textCooldown = 5f;        // Cooldown time in seconds before text can be shown again
+
     void Start()
     {
         // Store the initial closed rotation of the door based on its pivot
@@ -85,7 +88,12 @@ public class DoorInteraction : MonoBehaviour
             {
                 Debug.Log("The door is locked. You need the correct key.");
                 StartCoroutine(ShakeDoor()); // Shake the door to indicate it's locked
-                ShowAndFadeInteractionText(doorInteractionText.text); // Show locked message
+
+                if (canShowText) // Only show the text if allowed (not on cooldown)
+                {
+                    ShowAndFadeInteractionText("The door is locked. You need the correct key."); // Show locked message
+                    StartCoroutine(TextCooldown()); // Start cooldown before showing text again
+                }
             }
         }
         else
@@ -152,6 +160,14 @@ public class DoorInteraction : MonoBehaviour
         // Once faded out, disable the text object
         doorInteractionText.gameObject.SetActive(false);
         doorInteractionText.color = originalColor; // Reset the color for the next use
+    }
+
+    // Cooldown to prevent text from being enabled again for a certain time
+    IEnumerator TextCooldown()
+    {
+        canShowText = false; // Disable text showing
+        yield return new WaitForSeconds(textCooldown); // Wait for the cooldown period
+        canShowText = true; // Enable text showing again
     }
 
     bool IsLookingAtDoor()
