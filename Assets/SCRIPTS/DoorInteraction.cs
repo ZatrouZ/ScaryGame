@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class DoorInteraction : MonoBehaviour
 {
@@ -22,6 +23,11 @@ public class DoorInteraction : MonoBehaviour
 
     public PlayerInventory playerInventory; // Reference to the player's inventory to check for keys
 
+    [Header("UI Settings")]
+    public Text doorInteractionText;        // UI Text that shows the door interaction message
+    public float fadeDuration = 2f;         // Time taken for text to fade out
+    public float displayDuration = 2f;      // Time before the text starts fading out
+
     void Start()
     {
         // Store the initial closed rotation of the door based on its pivot
@@ -33,6 +39,12 @@ public class DoorInteraction : MonoBehaviour
         if (playerCamera == null)
         {
             Debug.LogError("Player Camera not found! Ensure your camera is tagged as 'MainCamera'.");
+        }
+
+        // Ensure the interaction text is initially disabled
+        if (doorInteractionText != null)
+        {
+            doorInteractionText.gameObject.SetActive(false);
         }
     }
 
@@ -73,6 +85,7 @@ public class DoorInteraction : MonoBehaviour
             {
                 Debug.Log("The door is locked. You need the correct key.");
                 StartCoroutine(ShakeDoor()); // Shake the door to indicate it's locked
+                ShowAndFadeInteractionText("The door is locked... I better find a key or another way in."); // Show locked message
             }
         }
         else
@@ -105,6 +118,40 @@ public class DoorInteraction : MonoBehaviour
 
         // Reset door position back to original
         doorPivot.localPosition = originalPosition;
+    }
+
+    // Shows the interaction text and fades it out after a few seconds
+    void ShowAndFadeInteractionText(string message)
+    {
+        if (doorInteractionText != null)
+        {
+            doorInteractionText.text = message; // Set the message
+            doorInteractionText.gameObject.SetActive(true); // Enable the text
+
+            // Start the coroutine to fade out the text after display
+            StartCoroutine(FadeOutText());
+        }
+    }
+
+    // Coroutine to fade out the interaction text after a delay
+    IEnumerator FadeOutText()
+    {
+        yield return new WaitForSeconds(displayDuration); // Wait before starting fade out
+
+        float elapsedTime = 0f;
+        Color originalColor = doorInteractionText.color;
+
+        while (elapsedTime < fadeDuration)
+        {
+            elapsedTime += Time.deltaTime;
+            float alpha = Mathf.Lerp(1, 0, elapsedTime / fadeDuration); // Gradually reduce alpha
+            doorInteractionText.color = new Color(originalColor.r, originalColor.g, originalColor.b, alpha);
+            yield return null;
+        }
+
+        // Once faded out, disable the text object
+        doorInteractionText.gameObject.SetActive(false);
+        doorInteractionText.color = originalColor; // Reset the color for the next use
     }
 
     bool IsLookingAtDoor()
