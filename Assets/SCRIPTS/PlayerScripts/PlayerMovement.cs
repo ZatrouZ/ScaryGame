@@ -5,47 +5,47 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     [Header("Movement")]
-    private float moveSpeed; // The current movement speed, varies depending on the state (walking, sprinting, crouching)
-    public float walkSpeed;  // Speed while walking
-    public float sprintSpeed; // Speed while sprinting
-    public float groundDrag; // Drag applied when on the ground to slow the player down
+    private float moveSpeed;
+    public float walkSpeed;
+    public float sprintSpeed;
+    public float groundDrag;
 
     [Header("Jumping")]
-    public float jumpForce; // Force applied when jumping
-    public float jumpCooldown; // Time between jumps to prevent continuous jumping
-    public float airMultiplier; // Movement speed multiplier when in the air
-    bool readyToJump; // Flag to determine if the player is ready to jump again
+    public float jumpForce;
+    public float jumpCooldown;
+    public float airMultiplier;
+    bool readyToJump;
 
     [Header("Crouching")]
-    public float crouchSpeed; // Speed while crouching
-    public float crouchYScale; // The reduced height of the player when crouching
-    private float startYScale; // The player's original height
+    public float crouchSpeed;
+    public float crouchYScale;
+    private float startYScale;
 
     [Header("Keybinds")]
-    public KeyCode jumpKey = KeyCode.Space; // Key to trigger jumping
-    public KeyCode sprintKey = KeyCode.LeftShift; // Key to trigger sprinting
-    public KeyCode crouchKey = KeyCode.LeftControl; // Key to trigger crouching
+    public KeyCode jumpKey = KeyCode.Space;
+    public KeyCode sprintKey = KeyCode.LeftShift;
+    public KeyCode crouchKey = KeyCode.LeftControl;
 
     [Header("Ground Check")]
-    public float playerHeight; // The height of the player, used for ground checks
-    public LayerMask whatIsGround; // What is considered ground for the player
-    bool grounded; // Is the player currently on the ground?
+    public float playerHeight;
+    public LayerMask whatIsGround;
+    bool grounded;
 
     [Header("Slope Handling")]
-    public float maxSlopeAngle; // The maximum angle the player can walk on without sliding
-    private RaycastHit slopeHit; // Information about the slope the player is currently on
-    private bool exitingSlope; // Flag to prevent slope issues when jumping
+    public float maxSlopeAngle;
+    private RaycastHit slopeHit;
+    private bool exitingSlope;
 
-    public Transform orientation; // Orientation used to determine movement direction
+    public Transform orientation;
 
-    float horizontalInput; // Horizontal movement input (A/D or Left/Right keys)
-    float verticalInput; // Vertical movement input (W/S or Up/Down keys)
+    float horizontalInput;
+    float verticalInput;
 
-    Vector3 moveDirection; // The direction the player is moving in
+    Vector3 moveDirection;
 
-    Rigidbody rb; // Rigidbody component for controlling player physics
+    Rigidbody rb;
 
-    public MovementState state; // The player's current movement state
+    public MovementState state;
     public enum MovementState
     {
         walking,
@@ -54,28 +54,41 @@ public class PlayerMovement : MonoBehaviour
         air
     }
 
+    [Header("Footstep Sounds")]
+    public AudioSource footstepAudioSource; // AudioSource for footsteps
+    public AudioClip[] grassFootsteps; // Array of footstep sounds for grass
+    public AudioClip[] woodFootsteps; // Array of footstep sounds for wood
+    public AudioClip[] stoneFootsteps; // Array of footstep sounds for stone
+    public float walkFootstepSpeed = 1f;
+    public float sprintFootstepSpeed = 1.5f;
+    private bool isPlayingFootstepSound = false;
+
+    private string currentSurfaceTag = "Default"; // Store the tag of the surface the player is walking on
+
     private void Start()
     {
-        // Get the Rigidbody component attached to the player
         rb = GetComponent<Rigidbody>();
-        rb.freezeRotation = true; // Prevents the player from rotating due to physics
+        rb.freezeRotation = true;
 
-        readyToJump = true; // Player starts ready to jump
+        readyToJump = true;
+        startYScale = transform.localScale.y;
 
-        startYScale = transform.localScale.y; // Save the original height of the player
+        // Set up the footstep AudioSource
+        footstepAudioSource.loop = true; // Loop the footsteps audio
     }
 
     private void Update()
     {
-        // Check if the player is grounded using a raycast
         grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.2f, whatIsGround);
 
-        // Handle inputs and state updates
         MyInput();
         SpeedControl();
         StateHandler();
 
-        // Apply drag when grounded, remove drag when in the air
+        // Detect surface and play footsteps
+        DetectSurface();
+        HandleFootsteps();
+
         if (grounded)
             rb.drag = groundDrag;
         else
@@ -84,61 +97,54 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        // Call the movement function every physics update
+        Debug.Log("FixedUpdate called");
         MovePlayer();
     }
 
+
     private void MyInput()
     {
-        // Capture horizontal and vertical input
         horizontalInput = Input.GetAxisRaw("Horizontal");
         verticalInput = Input.GetAxisRaw("Vertical");
 
-        // Jump when the jump key is pressed and the player is grounded and ready to jump
         if (Input.GetKey(jumpKey) && readyToJump && grounded)
         {
-            readyToJump = false; // Disable jumping until cooldown is over
+            readyToJump = false;
 
-            Jump(); // Perform the jump
+            Jump();
 
-            Invoke(nameof(ResetJump), jumpCooldown); // Reset the jump after the cooldown
+            Invoke(nameof(ResetJump), jumpCooldown);
         }
 
-        // Start crouching when crouch key is pressed
         if (Input.GetKeyDown(crouchKey))
         {
-            transform.localScale = new Vector3(transform.localScale.x, crouchYScale, transform.localScale.z); // Lower the player's height
-            rb.AddForce(Vector3.down * 5f, ForceMode.Impulse); // Force downwards to stick the player to the ground
+            transform.localScale = new Vector3(transform.localScale.x, crouchYScale, transform.localScale.z);
+            rb.AddForce(Vector3.down * 5f, ForceMode.Impulse);
         }
 
-        // Stop crouching when crouch key is released
         if (Input.GetKeyUp(crouchKey))
         {
-            transform.localScale = new Vector3(transform.localScale.x, startYScale, transform.localScale.z); // Restore the original height
+            transform.localScale = new Vector3(transform.localScale.x, startYScale, transform.localScale.z);
         }
     }
 
     private void StateHandler()
     {
-        // Crouching state
         if (Input.GetKey(crouchKey))
         {
             state = MovementState.crouching;
             moveSpeed = crouchSpeed;
         }
-        // Sprinting state
         else if (grounded && Input.GetKey(sprintKey))
         {
             state = MovementState.sprinting;
             moveSpeed = sprintSpeed;
         }
-        // Walking state
         else if (grounded)
         {
             state = MovementState.walking;
             moveSpeed = walkSpeed;
         }
-        // Airborne state (jumping or falling)
         else
         {
             state = MovementState.air;
@@ -147,83 +153,138 @@ public class PlayerMovement : MonoBehaviour
 
     private void MovePlayer()
     {
-        // Calculate the movement direction based on player input and orientation
         moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
 
-        // Movement on a slope
         if (OnSlope() && !exitingSlope)
         {
-            rb.AddForce(GetSlopeMoveDirection() * moveSpeed * 20f, ForceMode.Force); // Apply force in slope direction
+            rb.AddForce(GetSlopeMoveDirection() * moveSpeed * 20f, ForceMode.Force);
 
-            // Counteract vertical movement on the slope
             if (rb.velocity.y > 0)
                 rb.AddForce(Vector3.down * 80f, ForceMode.Force);
         }
-        // Movement on flat ground
         else if (grounded)
             rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
-        // Movement in the air
         else if (!grounded)
             rb.AddForce(moveDirection.normalized * moveSpeed * 10f * airMultiplier, ForceMode.Force);
 
-        // Disable gravity on slopes
         rb.useGravity = !OnSlope();
     }
 
     private void SpeedControl()
     {
-        // Limit speed on slopes
         if (OnSlope() && !exitingSlope)
         {
             if (rb.velocity.magnitude > moveSpeed)
                 rb.velocity = rb.velocity.normalized * moveSpeed;
         }
-        // Limit speed on flat ground or in the air
         else
         {
-            Vector3 flatVel = new Vector3(rb.velocity.x, 0f, rb.velocity.z); // Get only horizontal velocity
+            Vector3 flatVel = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
 
-            // If speed exceeds max, limit it
             if (flatVel.magnitude > moveSpeed)
             {
                 Vector3 limitedVel = flatVel.normalized * moveSpeed;
-                rb.velocity = new Vector3(limitedVel.x, rb.velocity.y, limitedVel.z); // Apply limited velocity
+                rb.velocity = new Vector3(limitedVel.x, rb.velocity.y, limitedVel.z);
             }
         }
     }
 
     private void Jump()
     {
-        exitingSlope = true; // Indicate that we are leaving a slope
+        exitingSlope = true;
 
-        // Reset vertical velocity before jumping
         rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
 
-        // Add upward force for jumping
         rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
     }
 
     private void ResetJump()
     {
-        readyToJump = true; // Reset jump flag after cooldown
-        exitingSlope = false; // No longer exiting a slope
+        readyToJump = true;
+        exitingSlope = false;
     }
 
-    // Check if the player is on a slope
     private bool OnSlope()
     {
         if (Physics.Raycast(transform.position, Vector3.down, out slopeHit, playerHeight * 0.5f + 0.3f))
         {
             float angle = Vector3.Angle(Vector3.up, slopeHit.normal);
-            return angle < maxSlopeAngle && angle != 0; // True if slope angle is within acceptable range
+            return angle < maxSlopeAngle && angle != 0;
         }
 
-        return false; // Not on a slope
+        return false;
     }
 
-    // Get movement direction on a slope
     private Vector3 GetSlopeMoveDirection()
     {
-        return Vector3.ProjectOnPlane(moveDirection, slopeHit.normal).normalized; // Adjust movement to follow the slope
+        return Vector3.ProjectOnPlane(moveDirection, slopeHit.normal).normalized;
+    }
+
+    // Detect surface type based on the object's tag
+    private void DetectSurface()
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, Vector3.down, out hit, playerHeight * 0.5f + 0.3f))
+        {
+            currentSurfaceTag = hit.collider.tag; // Get the tag of the object being hit by the raycast
+        }
+    }
+
+    // Handle playing footstep sounds based on surface type
+    private void HandleFootsteps()
+    {
+        if (grounded && (horizontalInput != 0 || verticalInput != 0))
+        {
+            if (!isPlayingFootstepSound)
+            {
+                PlayFootstepSound(); // Play the appropriate footstep sound
+                footstepAudioSource.Play();
+                isPlayingFootstepSound = true;
+            }
+
+            if (state == MovementState.sprinting)
+            {
+                footstepAudioSource.pitch = sprintFootstepSpeed;
+            }
+            else
+            {
+                footstepAudioSource.pitch = walkFootstepSpeed;
+            }
+        }
+        else
+        {
+            if (isPlayingFootstepSound)
+            {
+                footstepAudioSource.Stop();
+                isPlayingFootstepSound = false;
+            }
+        }
+    }
+
+    // Play the correct footstep sound based on the current surface
+    private void PlayFootstepSound()
+    {
+        AudioClip[] footstepClips = null;
+
+        switch (currentSurfaceTag)
+        {
+            case "Grass":
+                footstepClips = grassFootsteps;
+                break;
+            case "Wood":
+                footstepClips = woodFootsteps;
+                break;
+            case "Stone": // Replaced "Metal" with "Stone"
+                footstepClips = stoneFootsteps;
+                break;
+            default:
+                footstepClips = grassFootsteps; // Default to grass if no tag matches
+                break;
+        }
+
+        if (footstepClips != null && footstepClips.Length > 0)
+        {
+            footstepAudioSource.clip = footstepClips[Random.Range(0, footstepClips.Length)];
+        }
     }
 }

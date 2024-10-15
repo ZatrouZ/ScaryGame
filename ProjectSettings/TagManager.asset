@@ -7,6 +7,9 @@ TagManager:
   - Enemy
   - SkyboxCamera
   - Door
+  - Stone
+  - Wood
+  - Grass
   layers:
   - Default
   - TransparentFX
