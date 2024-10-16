@@ -59,6 +59,12 @@ public class PlayerMovement : MonoBehaviour
     public AudioClip[] grassFootsteps; // Array of footstep sounds for grass
     public AudioClip[] woodFootsteps; // Array of footstep sounds for wood
     public AudioClip[] stoneFootsteps; // Array of footstep sounds for stone
+
+    // Volume settings for each type of surface
+    [Range(0, 1)] public float grassVolume = 1f;  // Volume for grass footsteps
+    [Range(0, 1)] public float woodVolume = 1f;   // Volume for wood footsteps
+    [Range(0, 1)] public float stoneVolume = 1f;  // Volume for stone footsteps
+
     public float walkFootstepSpeed = 1f;
     public float sprintFootstepSpeed = 1.5f;
     private bool isPlayingFootstepSound = false;
@@ -97,10 +103,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        Debug.Log("FixedUpdate called");
         MovePlayer();
     }
-
 
     private void MyInput()
     {
@@ -110,9 +114,7 @@ public class PlayerMovement : MonoBehaviour
         if (Input.GetKey(jumpKey) && readyToJump && grounded)
         {
             readyToJump = false;
-
             Jump();
-
             Invoke(nameof(ResetJump), jumpCooldown);
         }
 
@@ -192,9 +194,7 @@ public class PlayerMovement : MonoBehaviour
     private void Jump()
     {
         exitingSlope = true;
-
         rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
-
         rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
     }
 
@@ -211,7 +211,6 @@ public class PlayerMovement : MonoBehaviour
             float angle = Vector3.Angle(Vector3.up, slopeHit.normal);
             return angle < maxSlopeAngle && angle != 0;
         }
-
         return false;
     }
 
@@ -265,26 +264,32 @@ public class PlayerMovement : MonoBehaviour
     private void PlayFootstepSound()
     {
         AudioClip[] footstepClips = null;
+        float volume = 1f;  // Default volume
 
         switch (currentSurfaceTag)
         {
             case "Grass":
                 footstepClips = grassFootsteps;
+                volume = grassVolume;
                 break;
             case "Wood":
                 footstepClips = woodFootsteps;
+                volume = woodVolume;
                 break;
             case "Stone": // Replaced "Metal" with "Stone"
                 footstepClips = stoneFootsteps;
+                volume = stoneVolume;
                 break;
             default:
                 footstepClips = grassFootsteps; // Default to grass if no tag matches
+                volume = grassVolume;
                 break;
         }
 
         if (footstepClips != null && footstepClips.Length > 0)
         {
             footstepAudioSource.clip = footstepClips[Random.Range(0, footstepClips.Length)];
+            footstepAudioSource.volume = volume;  // Apply the volume based on the surface type
         }
     }
 }

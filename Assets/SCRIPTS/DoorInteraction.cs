@@ -28,6 +28,13 @@ public class DoorInteraction : MonoBehaviour
     public float fadeDuration = 2f;         // Time taken for text to fade out
     public float displayDuration = 2f;      // Time before the text starts fading out
 
+    [Header("Audio Settings")]
+    public AudioSource audioSource;             // AudioSource component to play sounds
+    public AudioClip lockedDoorSound;           // Sound clip for trying to open the locked door
+    public AudioClip doorOpenSound;             // Sound clip for opening the door
+    public AudioClip doorCloseSound;            // Sound clip for closing the door
+    public AudioClip unlockWithKeySound;        // Sound clip for unlocking the door with a key
+
     private bool canShowText = true;        // To control when the text can be shown
     private float textCooldown = 5f;        // Cooldown time in seconds before text can be shown again
 
@@ -82,12 +89,14 @@ public class DoorInteraction : MonoBehaviour
             {
                 Debug.Log("Door unlocked!");
                 isLocked = false;  // Unlock the door
+                PlayUnlockWithKeySound(); // Play unlock sound
                 ToggleDoor();  // Open the door
             }
             else
             {
                 Debug.Log("The door is locked. You need the correct key.");
                 StartCoroutine(ShakeDoor()); // Shake the door to indicate it's locked
+                PlayLockedDoorSound(); // Play sound for locked door interaction
 
                 if (canShowText) // Only show the text if allowed (not on cooldown)
                 {
@@ -105,6 +114,15 @@ public class DoorInteraction : MonoBehaviour
     void ToggleDoor()
     {
         isOpen = !isOpen; // Toggle the state (open or close the door)
+
+        if (isOpen)
+        {
+            PlayDoorOpenSound(); // Play the door opening sound
+        }
+        else
+        {
+            PlayDoorCloseSound(); // Play the door closing sound
+        }
     }
 
     // Coroutine to shake the door when locked
@@ -126,6 +144,42 @@ public class DoorInteraction : MonoBehaviour
 
         // Reset door position back to original
         doorPivot.localPosition = originalPosition;
+    }
+
+    // Play the sound for interacting with a locked door
+    void PlayLockedDoorSound()
+    {
+        if (audioSource != null && lockedDoorSound != null)
+        {
+            audioSource.PlayOneShot(lockedDoorSound); // Play the locked door sound
+        }
+    }
+
+    // Play the sound for unlocking the door with a key
+    void PlayUnlockWithKeySound()
+    {
+        if (audioSource != null && unlockWithKeySound != null)
+        {
+            audioSource.PlayOneShot(unlockWithKeySound); // Play the unlock sound
+        }
+    }
+
+    // Play the sound for opening the door
+    void PlayDoorOpenSound()
+    {
+        if (audioSource != null && doorOpenSound != null)
+        {
+            audioSource.PlayOneShot(doorOpenSound); // Play the door opening sound
+        }
+    }
+
+    // Play the sound for closing the door
+    void PlayDoorCloseSound()
+    {
+        if (audioSource != null && doorCloseSound != null)
+        {
+            audioSource.PlayOneShot(doorCloseSound); // Play the door closing sound
+        }
     }
 
     // Shows the interaction text and fades it out after a few seconds
